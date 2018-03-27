@@ -65,7 +65,7 @@ int isSameOperator(char ch1,char ch2){
 int findNextFrontier(char* code,int j){
 
 
-    for(;!isFrontier(code[j]);++j){
+    for(;isStrNotEnd(code[j]) && !isFrontier(code[j]);++j){
 
 
 
@@ -119,7 +119,7 @@ void stringError(){
 
 int findNextOperator(char* code,int i){
 
-    for(;!isOperator(code[i]);++i){
+    for(;isStrNotEnd(code[i]) && !isOperator(code[i]);++i){
 
 
     }
@@ -132,7 +132,7 @@ int findNextNotOperator(char* code,int i){
 
 
 
-    for(;isOperator(code[i]);++i){
+    for(;isStrNotEnd(code[i]) && isOperator(code[i]);++i){
 
 
     }

@@ -1,0 +1,5 @@
+int inta_a = 20;
+int asd_bb = 30;
+int k = inta_a+asd_bb;
+int inas_b=10A;
+
