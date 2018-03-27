@@ -2,6 +2,7 @@
 #include<ctype.h>
 #include<string.h>
 #include<stdlib.h>
+#include<math.h>
 #define MAXLINE 65536
 
 /*
@@ -17,7 +18,7 @@ keep source code every line including less word than 65536
 **/
 
 char map[7][7] = {"if","else","while","for","int","float","string"};
-int lineCounter = 0;
+int lineCounter = 1;
 
 int isOperator(char ch){
 
@@ -115,6 +116,37 @@ void stringError(){
 
     printf("Error(Line:%d): string leak '\"'");
 }
+
+int findNextOperator(char* code,int i){
+
+    for(;!isOperator(code[i]);++i){
+
+
+    }
+
+    return i;
+
+}
+
+int findNextNotOperator(char* code,int i){
+
+
+
+    for(;isOperator(code[i]);++i){
+
+
+    }
+
+    return i;
+}
+
+int min(int x,int y){
+
+
+
+    return x > y ? y : x;
+
+}
 void analyse(char* code){
 
     int i;
@@ -130,9 +162,11 @@ void analyse(char* code){
         if(isalpha(code[i])){
 
             j = findNextFrontier(code,i);
+            int k = findNextOperator(code,i);
+            j = min(k,j);
+            char p[j-i+1];
+            //char* p = (char*)malloc(j-i + 1);
 
-            char* p = (char*)malloc(j-i + 1);
-            int k;
             for(k = 0; k < j - i; ++k){
 
                 p[k] = code[i+k];
@@ -152,6 +186,7 @@ void analyse(char* code){
             if(status == 1){
 
                 i = j - 1;
+                //free(p);
                 continue;
             }
             else{
@@ -173,70 +208,107 @@ void analyse(char* code){
                     /**输出错误信息**/
                     variableNameError(p);
                     i = j - 1;
+                    //free(p);
                     continue;
                 }
                 else{
 
-
+                    //free(p);
                     continue;
                 }
             }
         }
         else if(isdigit(code[i])){
 
-            char* p = (char*) malloc(256);
-            int counter = 1;
-            int num = 256;
-            p[0] = code[i];
+            j = findNextFrontier(code,i);
+            int k = findNextOperator(code,i);
+            j = min(k,j);
             int status = 0;
-            for(j = i + 1;isStrNotEnd(code[j]); ++j){
 
-                if(isdigit(code[j])){
+            for(k = i;k < j; ++k){
 
-                    if(num = counter){
 
-                        enlargeArray(p,&num);
+                if(!isdigit(code[k])){
 
-                    }
-                    p[counter++] = code[j];
-                    continue;
-                }
-                else if(isFrontier(code[j])){
 
-                    break;
-                }
-                else if(isalpha(code[j])){
-
-                    /**输出错误信息**/
-
-                    p[counter++] = code[j];
-                    p[counter] = 0;
-                    constentDigitError(p);
-                    //找到下一个界符，继续词法分析
-
-                    i = findNextFrontier(code,j) - 1;
                     status = 1;
                     break;
-
-                }
-
-                else if(isOperator(code[j])){
-
-                    break;
-
                 }
             }
 
-            if(status == 0){
+            if(status == 1){
 
-                i = j-1;
+                /**输出错误信息**/
+                char temp[j - i + 1];
+                for(k = 0; k < j - i; ++k){
+
+
+                    temp[k] = code[i+k];
+                }
+                temp[k] = 0;
+                constentDigitError(temp);
+
+
             }
             else{
 
 
             }
+            i = j - 1;
 
-            free(p);
+//            char* p = (char*) malloc(256);
+//            int counter = 1;
+//            int num = 256;
+//            p[0] = code[i];
+//            int status = 0;
+//            for(j = i + 1;isStrNotEnd(code[j]); ++j){
+//
+//                if(isdigit(code[j])){
+//
+//                    if(num = counter){
+//
+//                        enlargeArray(p,&num);
+//
+//                    }
+//                    p[counter++] = code[j];
+//                    continue;
+//                }
+//                else if(isFrontier(code[j])){
+//
+//                    break;
+//                }
+//                else if(isalpha(code[j])){
+//
+//                    /**输出错误信息**/
+//
+//                    p[counter++] = code[j];
+//                    p[counter] = 0;
+//                    constentDigitError(p);
+//                    //找到下一个界符，继续词法分析
+//
+//                    i = findNextFrontier(code,j) - 1;
+//                    status = 1;
+//                    break;
+//
+//                }
+//
+//                else if(isOperator(code[j])){
+//
+//                    break;
+//
+//                }
+//            }
+//
+//            if(status == 0){
+//
+//                i = j-1;
+//            }
+//            else{
+//
+//
+//            }
+//
+//            free(p);
 
         }
         else if(isOperator(code[i])){
@@ -263,7 +335,8 @@ void analyse(char* code){
 
                 operatorError(code[i],code[i+1]);
                 //找到下一个界符，继续词法分析
-                i = findNextFrontier(code,i+1) -1 ;
+                i = findNextNotOperator(code,i+1) - 1;
+                //i = findNextFrontier(code,i+1) -1 ;
                 continue;
             }
             if(code[i] == '+' || code[i] == '-' ){
@@ -275,7 +348,8 @@ void analyse(char* code){
 
                 /**输出错误信息**/
                 operatorError(code[i],code[i+1]);
-                i = findNextFrontier(code,i+1) - 1;
+                i = findNextNotOperator(code,i+1) - 1;
+                //i = findNextFrontier(code,i+1) - 1;
                 continue;
             }
         }
@@ -295,10 +369,11 @@ void analyse(char* code){
 
                 /**输出错误信息**/
                 stringError();
-
+                break;
             }
             else{
 
+                i = j;
                 continue;
             }
         }
@@ -329,8 +404,17 @@ int main(int argc,char** argv){
 
     char buffer[MAXLINE];
 
+    int k;
     while(fgets(buffer,MAXLINE,fp) != NULL){
 
+
+        for(k = 0 ; buffer[k]!= 0;++k){
+
+            if(buffer[k] == '\n'){
+
+                buffer[k] = 0;
+            }
+        }
         analyse(buffer);
         ++lineCounter;
     }
