@@ -7,6 +7,7 @@ Date: 2018Äê4ÔÂ10ÈÕ
 ****************************************************************************/
 #include <stdio.h>
 #include "myparser.h"
+char* filter(char* str);
 int IDENT = 1;
 int INTEGERCONSTENT = 2;
 int STRINGCONSTENT = 3;
@@ -15,11 +16,13 @@ int OPERATOR = 5;
 int BOUND = 6;
 
 %}
+
+RESERVEDWORD if|else|while|for|int|float|string
 IDENT [a-zA-Z][a-zA-Z0-9]*
 INTEGER_CONSTENT [+-][0-9]+|[0-9]+
 STRING_CONSTENT ["].*["]
-RESERVEDWORD if|else|while|for|int|float|string
-OPERATOR +|-|*|/|=|+=|-=|*=|/=|==|<=|>=|<|>
+OPERATOR [+]|[-]|[*]|[/]|[=]|[+][=]|[-][=]|[*][=]|[/][=]|[=][=]|[<][=]|[>][=]|[<]|[>]
+
 BOUND ;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -28,26 +31,46 @@ BOUND ;
 // place any declarations here
 
 %%
-
-{IDENT} {printf("%s:%d\n",yytext,IDENT);}
-{INTEGER_CONSTENT} {printf("%s:%d\n",yytext,INTEGER_CONSTENT);}
-{STRING_CONSTENT} {printf("%s:%d\n",yytext,STRING_CONSTENT);}
-{RESERVEDWORD} {printf("%s:%d\n",yytext,RESERVEDWORD);}
-{BOUND} {printf("%s:%d\n",yytext,BOUND);}
+{RESERVEDWORD} {printf("%s:%d\n",filter(yytext),RESERVEDWORD);}
+{IDENT} {printf("%s:%d\n",filter(yytext),IDENT);}
+{INTEGER_CONSTENT} {printf("%s:%d\n",filter(yytext),INTEGERCONSTENT);}
+{STRING_CONSTENT} {printf("%s:%d\n",filter(yytext),STRINGCONSTENT);}
+{OPERATOR} {printf("%s:%d\n",filter(yytext),OPERATOR);}
+{BOUND} {printf("%s:%d\n",filter(yytext),BOUND);}
 %%
-#pragma comment(lib,"yl.lib")
 int main(void)
- {
- yyin=stdin;
- yylex(); /* start the
- analysis*/
- printf(" No of words:
- %d\n", wordCount);
- return yylex();
- }
- 
-int yywrap(){
- return 1;
+{
+	int n = yylex();
+	return n;
 }
 
+int yywrap(void)
+{
+	
+	return 1;
+}
+
+char* filter(char* str){
+
+
+	int i = 0;
+	for(i = 0; str[i] != 0; ++i){
+	
+		if(str[i] == ' '){
+		
+			int j = i;
+			for(;str[j+1] != 0 ; ++j){
+			
+				str[j] = str[j+1];
+				
+				
+			}
+			
+			str[j] = 0;
+		}
+		
+	}
+	
+	return str;
+}
 
